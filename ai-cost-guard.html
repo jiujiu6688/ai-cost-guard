@@ -12,6 +12,9 @@
         .hero h1 { font-size: 3rem; margin-bottom: 20px; }
         .hero p { font-size: 1.3rem; opacity: 0.9; margin-bottom: 30px; }
         .cta { background: #00d4ff; color: #1a1a2e; padding: 15px 40px; font-size: 1.1rem; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        .email-form { margin-top: 20px; }
+        .email-form input { padding: 15px 20px; font-size: 1rem; border: none; border-radius: 50px; width: 280px; margin-right: 10px; }
+        .email-form button { padding: 15px 30px; font-size: 1rem; }
         .features { padding: 60px 20px; max-width: 1000px; margin: 0 auto; }
         .features h2 { text-align: center; margin-bottom: 40px; font-size: 2rem; }
         .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
@@ -26,13 +29,19 @@
         .price span { font-size: 1rem; color: #666; }
         .price-card.highlight { border: 3px solid #00d4ff; transform: scale(1.05); }
         .footer { background: #1a1a2e; color: white; padding: 40px 20px; text-align: center; }
+        .success-message { display: none; color: #00d4ff; margin-top: 15px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
     <div class="hero">
         <h1>🤖 AI Cost Guard</h1>
         <p>AI API 成本预测与预算管理平台<br>再也不用担心月底的 AI 账单了</p>
-        <button class="cta" onclick="document.getElementById('email').focus()">🚀 免费开始使用</button>
+        
+        <form class="email-form" action="mailto:contact@dyggg.cc?subject=AI Cost Guard Waitlist" method="post" enctype="text/plain">
+            <input type="email" name="email" placeholder="输入你的邮箱" required>
+            <button type="submit" class="cta">🚀 加入等待列表</button>
+        </form>
+        <p class="success-message">✓ 感谢！我们会尽快联系你</p>
     </div>
     
     <div class="features">
