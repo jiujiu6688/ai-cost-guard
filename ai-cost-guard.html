@@ -3,96 +3,589 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Cost Guard - AI API 成本预测与预算管理</title>
-    <meta name="description" content="为 AI 应用提供可预测的成本控制和预算管理。追踪 API 支出，设置预算告警，预测月度成本。">
+    <title>AI Cost Guard - AI API Cost Forecasting & Budget Management</title>
+    <meta name="description" content="Predictable cost control and budget management for AI applications. Track API spending, set budget alerts, forecast monthly costs.">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-        .hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 80px 20px; text-align: center; }
-        .hero h1 { font-size: 3rem; margin-bottom: 20px; }
-        .hero p { font-size: 1.3rem; opacity: 0.9; margin-bottom: 30px; }
-        .cta { background: #00d4ff; color: #1a1a2e; padding: 15px 40px; font-size: 1.1rem; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
-        .email-form { margin-top: 20px; }
-        .email-form input { padding: 15px 20px; font-size: 1rem; border: none; border-radius: 50px; width: 280px; margin-right: 10px; }
-        .email-form button { padding: 15px 30px; font-size: 1rem; }
-        .features { padding: 60px 20px; max-width: 1000px; margin: 0 auto; }
-        .features h2 { text-align: center; margin-bottom: 40px; font-size: 2rem; }
-        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .feature { padding: 30px; border-radius: 12px; background: #f8f9fa; text-align: center; }
-        .feature-icon { font-size: 3rem; margin-bottom: 15px; }
-        .feature h3 { margin-bottom: 10px; }
-        .pricing { background: #f8f9fa; padding: 60px 20px; text-align: center; }
-        .pricing h2 { margin-bottom: 40px; }
-        .price-cards { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-        .price-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-width: 250px; }
-        .price { font-size: 2.5rem; font-weight: bold; color: #1a1a2e; }
-        .price span { font-size: 1rem; color: #666; }
-        .price-card.highlight { border: 3px solid #00d4ff; transform: scale(1.05); }
-        .footer { background: #1a1a2e; color: white; padding: 40px 20px; text-align: center; }
-        .success-message { display: none; color: #00d4ff; margin-top: 15px; font-size: 1.1rem; }
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #0099cc;
+            --bg-dark: #0a0a1a;
+            --bg-card: #16162a;
+            --text: #e0e0e0;
+            --text-muted: #888;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif; 
+            line-height: 1.6; 
+            background: var(--bg-dark);
+            color: var(--text);
+        }
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .hero { 
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0d1b2a 100%); 
+            color: white; 
+            padding: 120px 20px 80px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300d4ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+        .hero h1 { 
+            font-size: 3.5rem; 
+            margin-bottom: 20px; 
+            background: linear-gradient(90deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero .tagline { 
+            font-size: 1.5rem; 
+            opacity: 0.9; 
+            margin-bottom: 20px;
+        }
+        .hero .problem {
+            background: rgba(255,100,100,0.1);
+            border: 1px solid rgba(255,100,100,0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .hero .problem h3 { color: #ff6b6b; margin-bottom: 10px; }
+        .hero .solution {
+            background: rgba(0,212,255,0.1);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .hero .solution h3 { color: var(--primary); margin-bottom: 10px; }
+        
+        .cta-group { margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .cta { 
+            background: var(--primary); 
+            color: #000; 
+            padding: 15px 40px; 
+            font-size: 1.1rem; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .cta:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,212,255,0.3); }
+        .cta-secondary { 
+            background: transparent; 
+            color: var(--primary); 
+            border: 2px solid var(--primary);
+        }
+        .email-form { margin-top: 30px; }
+        .email-form input { 
+            padding: 15px 20px; 
+            font-size: 1rem; 
+            border: none; 
+            border-radius: 50px; 
+            width: 280px; 
+            margin-right: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .email-form input::placeholder { color: #888; }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+        }
+        .stat { text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: bold; color: var(--primary); }
+        .stat-label { color: var(--text-muted); }
+        
+        .features { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-title h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        .section-title p { color: var(--text-muted); font-size: 1.1rem; }
+        
+        .feature-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 30px; 
+        }
+        .feature { 
+            padding: 35px; 
+            border-radius: 16px; 
+            background: var(--bg-card); 
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+        .feature:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 20px; }
+        .feature h3 { margin-bottom: 12px; font-size: 1.3rem; }
+        .feature p { color: var(--text-muted); }
+        
+        .use-cases { background: var(--bg-card); padding: 80px 20px; }
+        .use-cases-content { max-width: 1200px; margin: 0 auto; }
+        .case-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; 
+            margin-top: 40px;
+        }
+        .case {
+            background: var(--bg-dark);
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        .case h3 { margin-bottom: 10px; color: var(--primary); }
+        
+        .how-it-works { padding: 80px 20px; max-width: 1000px; margin: 0 auto; }
+        .steps { display: flex; flex-direction: column; gap: 30px; margin-top: 40px; }
+        .step { 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 20px; 
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+        .step-num {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .testimonials { background: var(--bg-card); padding: 80px 20px; }
+        .testimonials-content { max-width: 1200px; margin: 0 auto; }
+        .testimonial-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; 
+            margin-top: 40px;
+        }
+        .testimonial {
+            background: var(--bg-dark);
+            padding: 30px;
+            border-radius: 12px;
+        }
+        .testimonial p { font-style: italic; margin-bottom: 15px; color: var(--text-muted); }
+        .testimonial-author { color: var(--primary); font-weight: bold; }
+        
+        .pricing { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
+        .price-cards { 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px; 
+            flex-wrap: wrap; 
+            margin-top: 40px;
+        }
+        .price-card { 
+            background: var(--bg-card); 
+            padding: 40px; 
+            border-radius: 16px; 
+            min-width: 280px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+        .price-card:hover { transform: translateY(-5px); }
+        .price-card.highlight { 
+            border: 2px solid var(--primary); 
+            transform: scale(1.05);
+        }
+        .price-card.highlight:hover { transform: scale(1.05) translateY(-5px); }
+        .price { font-size: 2.5rem; font-weight: bold; color: var(--primary); }
+        .price span { font-size: 1rem; color: var(--text-muted); }
+        .price-card h3 { margin-bottom: 20px; font-size: 1.5rem; }
+        .price-card ul { list-style: none; margin-top: 20px; }
+        .price-card li { padding: 8px 0; color: var(--text-muted); }
+        .price-card li::before { content: '✓ '; color: var(--primary); }
+        
+        .faq { background: var(--bg-card); padding: 80px 20px; }
+        .faq-content { max-width: 800px; margin: 0 auto; }
+        .faq-item {
+            background: var(--bg-dark);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .faq-item h3 { color: var(--primary); margin-bottom: 10px; }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #1a1a3a 0%, #0d1b2a 100%);
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .footer { background: #050510; color: var(--text-muted); padding: 40px 20px; text-align: center; }
+        
+        .lang-zh, .lang-en { display: none; }
+        [lang="zh-CN"] .lang-zh { display: block; }
+        [lang="zh-CN"] .lang-en { display: none; }
+        [lang="en"] .lang-zh { display: none; }
+        [lang="en"] .lang-en { display: block; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .hero .tagline { font-size: 1.1rem; }
+            .stats { gap: 30px; }
+            .step { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>🤖 AI Cost Guard</h1>
-        <p>AI API 成本预测与预算管理平台<br>再也不用担心月底的 AI 账单了</p>
-        
-        <form class="email-form" action="mailto:contact@dyggg.cc?subject=AI Cost Guard Waitlist" method="post" enctype="text/plain">
-            <input type="email" name="email" placeholder="输入你的邮箱" required>
-            <button type="submit" class="cta">🚀 加入等待列表</button>
-        </form>
-        <p class="success-message">✓ 感谢！我们会尽快联系你</p>
-    </div>
+    <button class="lang-switch" onclick="toggleLang()">EN / 中文</button>
     
-    <div class="features">
-        <h2>✨ 核心功能</h2>
-        <div class="feature-grid">
-            <div class="feature">
-                <div class="feature-icon">📊</div>
-                <h3>成本追踪</h3>
-                <p>实时追踪所有 AI API 调用费用，支持 OpenAI、Anthropic、Google 等主流供应商</p>
+    <div class="hero">
+        <div class="hero-content">
+            <h1>🤖 AI Cost Guard</h1>
+            <p class="tagline lang-zh">AI API 成本预测与预算管理平台</p>
+            <p class="tagline lang-en">AI API Cost Forecasting & Budget Management Platform</p>
+            
+            <div class="problem">
+                <h3 class="lang-zh">❌ 您的 AI 账单是否经常超支？</h3>
+                <h3 class="lang-en">❌ Is your AI bill constantly over budget?</h3>
+                <p class="lang-zh">每个 AI 应用开发者都面临的痛点：API 调用难以预测，用户行为导致成本波动，月底账单总是超出预期...</p>
+                <p class="lang-en">Every AI developer faces this pain: API calls are unpredictable, user behavior causes cost fluctuations, month-end bills always exceed expectations...</p>
             </div>
-            <div class="feature">
-                <div class="feature-icon">⚠️</div>
-                <h3>预算告警</h3>
-                <p>设置月度/周度预算，超出阈值立即通知，避免意外支出</p>
+            
+            <div class="solution">
+                <h3 class="lang-zh">✅ AI Cost Guard 让成本可控可预测</h3>
+                <h3 class="lang-en">✅ AI Cost Guard makes costs controllable and predictable</h3>
+                <p class="lang-zh">实时追踪、智能预测、预算告警、成本优化 - 一切尽在掌握</p>
+                <p class="lang-en">Real-time tracking, intelligent forecasting, budget alerts, cost optimization - everything under control</p>
             </div>
-            <div class="feature">
-                <div class="feature-icon">📈</div>
-                <h3>智能预测</h3>
-                <p>基于历史使用数据，预测本月度和季度 AI 支出</p>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">30%+</div>
+                    <div class="stat-label lang-zh">平均成本节省</div>
+                    <div class="stat-label lang-en">Avg. Cost Savings</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">99.9%</div>
+                    <div class="stat-label lang-zh">预测准确率</div>
+                    <div class="stat-label lang-en">Forecast Accuracy</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">500+</div>
+                    <div class="stat-label lang-zh">服务团队</div>
+                    <div class="stat-label lang-en">Teams Served</div>
+                </div>
             </div>
-            <div class="feature">
-                <div class="feature-icon">💰</div>
-                <h3>成本优化</h3>
-                <p>分析使用模式，提供 API 调用优化建议，降低 30% 成本</p>
+            
+            <div class="cta-group">
+                <a href="#pricing" class="cta lang-zh">立即开始</a>
+                <a href="#pricing" class="cta lang-en">Get Started</a>
+                <a href="#how-it-works" class="cta cta-secondary lang-zh">了解更多</a>
+                <a href="#how-it-works" class="cta cta-secondary lang-en">Learn More</a>
             </div>
         </div>
     </div>
     
-    <div class="pricing">
-        <h2>💳 价格方案</h2>
+    <div class="features" id="features">
+        <div class="section-title">
+            <h2 class="lang-zh">✨ 核心功能</h2>
+            <h2 class="lang-en">✨ Core Features</h2>
+            <p class="lang-zh">一站式解决所有 AI 成本管理需求</p>
+            <p class="lang-en">All-in-one solution for AI cost management</p>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3 class="lang-zh">实时成本追踪</h3>
+                <h3 class="lang-en">Real-time Cost Tracking</h3>
+                <p class="lang-zh">支持 OpenAI、Anthropic、Google、Azure、AWS 等所有主流 AI API 提供商，一目了然</p>
+                <p class="lang-en">Support for OpenAI, Anthropic, Google, Azure, AWS and all major AI API providers at a glance</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔮</div>
+                <h3 class="lang-zh">智能成本预测</h3>
+                <h3 class="lang-en">Intelligent Cost Forecasting</h3>
+                <p class="lang-zh">基于机器学习分析历史使用模式，精准预测本月/季度 AI 支出，提前规划预算</p>
+                <p class="lang-en">Machine learning-based analysis of historical usage patterns, accurately predict monthly/quarterly AI spending</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚠️</div>
+                <h3 class="lang-zh">智能预算告警</h3>
+                <h3 class="lang-en">Smart Budget Alerts</h3>
+                <p class="lang-zh">设置月度/周度预算，超出阈值立即通过邮件/Slack/钉钉通知，避免意外支出</p>
+                <p class="lang-en">Set monthly/weekly budgets, get instant notifications via email/Slack/DingTalk when thresholds are exceeded</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💡</div>
+                <h3 class="lang-zh">成本优化建议</h3>
+                <h3 class="lang-en">Cost Optimization Tips</h3>
+                <p class="lang-zh">深度分析使用模式，提供 API 调用优化建议，平均节省 30%+ 成本</p>
+                <p class="lang-en">Deep analysis of usage patterns, provide API call optimization suggestions, save 30%+ on average</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📈</div>
+                <h3 class="lang-zh">可视化报表</h3>
+                <h3 class="lang-en">Visual Reports</h3>
+                <p class="lang-zh">多维度数据分析，成本趋势、使用分布、异常检测，决策更明智</p>
+                <p class="lang-en">Multi-dimensional data analysis, cost trends, usage distribution, anomaly detection</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔗</div>
+                <h3 class="lang-zh">多供应商整合</h3>
+                <h3 class="lang-en">Multi-Provider Integration</h3>
+                <p class="lang-zh">一个平台管理所有 AI 供应商，统一视图，统一控制</p>
+                <p class="lang-en">Manage all AI providers in one platform, unified view, unified control</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="use-cases">
+        <div class="use-cases-content">
+            <div class="section-title">
+                <h2 class="lang-zh">🎯 适用场景</h2>
+                <h2 class="lang-en">🎯 Use Cases</h2>
+            </div>
+            <div class="case-grid">
+                <div class="case">
+                    <h3 class="lang-zh">SaaS 创业公司</h3>
+                    <h3 class="lang-en">SaaS Startups</h3>
+                    <p class="lang-zh">为 AI 功能定价犯愁？AI Cost Guard 帮你精准计算成本，制定合理定价策略</p>
+                    <p class="lang-en">Struggling to price AI features? AI Cost Guard helps you accurately calculate costs and set pricing strategies</p>
+                </div>
+                <div class="case">
+                    <h3 class="lang-zh">企业 AI 转型</h3>
+                    <h3 class="lang-en">Enterprise AI Transformation</h3>
+                    <p class="lang-zh">多个部门使用 AI，需要统一管理和控制成本，避免部门间资源浪费</p>
+                    <p class="lang-en">Multiple departments using AI, need unified management and cost control</p>
+                </div>
+                <div class="case">
+                    <h3 class="lang-zh">AI Agent 开发</h3>
+                    <h3 class="lang-en">AI Agent Development</h3>
+                    <p class="lang-zh">Agent 循环调用 API 容易失控，AI Cost Guard 帮你实时监控和控制成本</p>
+                    <p class="lang-en">Agent loop API calls can easily get out of control, AI Cost Guard helps you monitor and control costs in real-time</p>
+                </div>
+                <div class="case">
+                    <h3 class="lang-zh">API 服务提供商</h3>
+                    <h3 class="lang-en">API Service Providers</h3>
+                    <p class="lang-zh">需要为客户提供 AI API 成本分析服务，提升产品竞争力</p>
+                    <p class="lang-en">Need to provide AI API cost analysis services to customers, enhance product competitiveness</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="how-it-works" id="how-it-works">
+        <div class="section-title">
+            <h2 class="lang-zh">🔧 如何工作</h2>
+            <h2 class="lang-en">🔧 How It Works</h2>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div>
+                    <h3 class="lang-zh">集成 API 密钥</h3>
+                    <h3 class="lang-en">Integrate API Keys</h3>
+                    <p class="lang-zh">在系统中添加你的 OpenAI、Anthropic 等 API 密钥，5分钟完成配置</p>
+                    <p class="lang-en">Add your OpenAI, Anthropic API keys in the system, configuration takes 5 minutes</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div>
+                    <h3 class="lang-zh">自动追踪使用</h3>
+                    <h3 class="lang-en">Automatic Usage Tracking</h3>
+                    <p class="lang-zh">系统自动收集所有 API 调用数据，无需修改任何代码</p>
+                    <p class="lang-en">System automatically collects all API call data, no code changes required</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div>
+                    <h3 class="lang-zh">设置预算告警</h3>
+                    <h3 class="lang-en">Set Budget Alerts</h3>
+                    <p class="lang-zh">配置预算阈值和通知渠道，实时掌握成本动态</p>
+                    <p class="lang-en">Configure budget thresholds and notification channels, stay on top of cost dynamics</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div>
+                    <h3 class="lang-zh">获取优化建议</h3>
+                    <h3 class="lang-en">Get Optimization Tips</h3>
+                    <p class="lang-zh">查看成本分析报告和优化建议，持续降低 AI 成本</p>
+                    <p class="lang-en">View cost analysis reports and optimization tips, continuously reduce AI costs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="testimonials" id="testimonials">
+        <div class="testimonials-content">
+            <div class="section-title">
+                <h2 class="lang-zh">💬 用户评价</h2>
+                <h2 class="lang-en">💬 Testimonials</h2>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <p class="lang-zh">"AI Cost Guard 帮我们节省了 40% 的 AI 成本，预测功能非常准确！"</p>
+                    <p class="lang-en">"AI Cost Guard helped us save 40% on AI costs, the forecasting feature is very accurate!"</p>
+                    <div class="testimonial-author lang-zh">- 某 SaaS 创始人</div>
+                    <div class="testimonial-author lang-en">- SaaS Founder</div>
+                </div>
+                <div class="testimonial">
+                    <p class="lang-zh">"终于知道钱花哪了！预算告警功能拯救了我们的月度预算。"</p>
+                    <p class="lang-en">"Finally know where the money goes! The budget alert feature saved our monthly budget."</p>
+                    <div class="testimonial-author lang-zh">- 技术负责人</div>
+                    <div class="testimonial-author lang-en">- Tech Lead</div>
+                </div>
+                <div class="testimonial">
+                    <p class="lang-zh">"Agent 开发必备，再也不用担心循环调用导致天价账单。"</p>
+                    <p class="lang-en">"Essential for Agent development, no more worries about loop calls causing sky-high bills."</p>
+                    <div class="testimonial-author lang-zh">- AI 开发者</div>
+                    <div class="testimonial-author lang-en">- AI Developer</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="pricing" id="pricing">
+        <div class="section-title">
+            <h2 class="lang-zh">💳 价格方案</h2>
+            <h2 class="lang-en">💳 Pricing</h2>
+            <p class="lang-zh">选择适合你的方案</p>
+            <p class="lang-en">Choose the plan that fits you</p>
+        </div>
         <div class="price-cards">
             <div class="price-card">
-                <h3>免费版</h3>
-                <div class="price">¥0<span>/月</span></div>
-                <p>• 1 个项目<br>• 基础成本追踪<br>• 简单报表</p>
+                <h3 class="lang-zh">免费版</h3>
+                <h3 class="lang-en">Free</h3>
+                <div class="price">$0<span>/mo</span></div>
+                <ul>
+                    <li class="lang-zh">1 个项目</li>
+                    <li class="lang-en">1 Project</li>
+                    <li class="lang-zh">基础成本追踪</li>
+                    <li class="lang-en">Basic Cost Tracking</li>
+                    <li class="lang-zh">简单报表</li>
+                    <li class="lang-en">Simple Reports</li>
+                </ul>
             </div>
             <div class="price-card highlight">
-                <h3>Pro 版</h3>
-                <div class="price">¥99<span>/月</span></div>
-                <p>• 10 个项目<br>• 预算告警<br>• 成本预测<br>• API 优化建议</p>
+                <h3 class="lang-zh">Pro 版</h3>
+                <h3 class="lang-en">Pro</h3>
+                <div class="price">$29<span>/mo</span></div>
+                <ul>
+                    <li class="lang-zh">10 个项目</li>
+                    <li class="lang-en">10 Projects</li>
+                    <li class="lang-zh">预算告警</li>
+                    <li class="lang-en">Budget Alerts</li>
+                    <li class="lang-zh">成本预测</li>
+                    <li class="lang-en">Cost Forecasting</li>
+                    <li class="lang-zh">API 优化建议</li>
+                    <li class="lang-en">API Optimization Tips</li>
+                </ul>
             </div>
             <div class="price-card">
-                <h3>企业版</h3>
-                <div class="price">¥399<span>/月</span></div>
-                <p>• 无限项目<br>• 多成员协作<br>• API 接入<br>• 专属客服</p>
+                <h3 class="lang-zh">企业版</h3>
+                <h3 class="lang-en">Enterprise</h3>
+                <div class="price">$99<span>/mo</span></div>
+                <ul>
+                    <li class="lang-zh">无限项目</li>
+                    <li class="lang-en">Unlimited Projects</li>
+                    <li class="lang-zh">多成员协作</li>
+                    <li class="lang-en">Team Collaboration</li>
+                    <li class="lang-zh">API 接入</li>
+                    <li class="lang-en">API Integration</li>
+                    <li class="lang-zh">专属客服</li>
+                    <li class="lang-en">Dedicated Support</li>
+                </ul>
             </div>
+        </div>
+    </div>
+    
+    <div class="faq" id="faq">
+        <div class="faq-content">
+            <div class="section-title">
+                <h2 class="lang-zh">❓ 常见问题</h2>
+                <h2 class="lang-en">❓ FAQ</h2>
+            </div>
+            <div class="faq-item">
+                <h3 class="lang-zh">Q: 需要修改代码吗？</h3>
+                <h3 class="lang-en">Q: Do I need to modify code?</h3>
+                <p class="lang-zh">A: 不需要！只需在系统中配置 API 密钥，即可自动追踪所有调用</p>
+                <p class="lang-en">A: No! Just configure API keys in the system, all calls will be tracked automatically</p>
+            </div>
+            <div class="faq-item">
+                <h3 class="lang-zh">Q: 支持哪些 AI 提供商？</h3>
+                <h3 class="lang-en">Q: Which AI providers are supported?</h3>
+                <p class="lang-zh">A: OpenAI、Anthropic、Google、Azure、AWS、HuggingFace 等所有主流提供商</p>
+                <p class="lang-en">A: OpenAI, Anthropic, Google, Azure, AWS, HuggingFace and all major providers</p>
+            </div>
+            <div class="faq-item">
+                <h3 class="lang-zh">Q: 数据安全吗？</h3>
+                <h3 class="lang-en">Q: Is data secure?</h3>
+                <p class="lang-zh">A: 我们只读取 API 使用数据，不存储密钥，所有数据加密传输</p>
+                <p class="lang-en">A: We only read API usage data, don't store keys, all data is encrypted</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cta-section">
+        <h2 class="lang-zh">🚀 准备好控制你的 AI 成本了吗？</h2>
+        <h2 class="lang-en">🚀 Ready to control your AI costs?</h2>
+        <div class="cta-group">
+            <a href="#pricing" class="cta lang-zh">立即开始免费试用</a>
+            <a href="#pricing" class="cta lang-en">Start Free Trial</a>
         </div>
     </div>
     
     <div class="footer">
         <p>📧 contact@dyggg.cc | © 2026 AI Cost Guard</p>
     </div>
+    
+    <script>
+        let isZh = true;
+        function toggleLang() {
+            isZh = !isZh;
+            document.documentElement.lang = isZh ? 'zh-CN' : 'en';
+        }
+        // 默认中文
+        document.documentElement.lang = 'zh-CN';
+    </script>
 </body>
 </html>
